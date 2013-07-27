@@ -12,10 +12,10 @@ class WordDictionary
     public:
 
     map<string, int> *dictionary;
-    WordDictionary(char *pathToDict) 
+    WordDictionary(string pathToDict) 
     {
         dictionary = new map<string, int>();
-        ifstream infile(pathToDict);
+        ifstream infile(pathToDict.c_str());
         string word;
         if(infile == NULL) {
             cerr << "Failed to open the dictionary file, program will now exit.";
@@ -27,9 +27,8 @@ class WordDictionary
         }
     }
 
-    bool search(char *word) {
-	string str(word);
-	map<string, int>::iterator i = dictionary -> find(str);
+    bool search(string word) {
+	map<string, int>::iterator i = dictionary -> find(word);
 	if (i == dictionary -> end()) {
 		return false;
 	} else {
@@ -44,10 +43,10 @@ class WordDictionary
     map<string, string> *knownCorrectionsMap;
 
     public:
-        NaiveCorrector(char *pathToDict, char *knownCorrectionsMapFile)
+        NaiveCorrector(string pathToDict, string knownCorrectionsMapFile)
         {
             knownCorrectionsMap = new map<string, string>();
-            fillKnownCorrections(knownCorrectionsMapFile);
+            fillKnownCorrections(knownCorrectionsMapFile.c_str());
             dict = new WordDictionary(pathToDict);
 
         }
@@ -74,7 +73,7 @@ class WordDictionary
 
     private :
         
-    void fillKnownCorrections(char *pathToFile)
+    void fillKnownCorrections(const char *pathToFile)
     {
         ifstream f(pathToFile);
         if(!f) {
@@ -100,12 +99,12 @@ class WordDictionary
 	}
     }
 
-    void oneDistanceReplacement(char *str, set<string> *listOfWords) 
+    void oneDistanceReplacement(string str, set<string> *listOfWords) 
     {
             char replacement[] = {"abcdefghijklmnopqrstuvwxyz"};
-            int l = strlen(str);
-            char *strc = new char[l];
-            strcpy(strc, str);
+            int l = str.length();
+            string strc = str;
+ //           strcpy(strc, str);
             char temp;
             for(int i = 0; i < l; i++) {//for each character
                 temp = strc[i];
@@ -205,7 +204,9 @@ class WordDictionary
 
 int main(int argc, char *argv[])
 {
-    NaiveCorrector *nc = new NaiveCorrector("wordlist.txt", "knowncorrections.txt");
+    string wordListPath("../data/wordlist.txt");
+    string knownCorrectionsFile("../data/knowncorrections.txt");
+    NaiveCorrector *nc = new NaiveCorrector(wordListPath, knownCorrectionsFile);
     char input[40];
     set<string> *corrections;
     while(strcmp(input, "bye")) {
