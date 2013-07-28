@@ -1,49 +1,7 @@
 //sg
-#include <iostream>
-#include <string.h>
-#include <fstream>
-#include <string>
-#include <set>
-#include <map>
-#include <vector>
+#include "edb.h"
 using namespace std;
-class WordDictionary
-{
-    public:
-
-    map<string, int> *dictionary;
-    WordDictionary(string pathToDict) 
-    {
-        dictionary = new map<string, int>();
-        ifstream infile(pathToDict.c_str());
-        string word;
-        if(infile == NULL) {
-            cerr << "Failed to open the dictionary file, program will now exit.";
-            return;
-        }
-        while(!infile.eof()) {
-		infile >> word;
-		dictionary -> insert(make_pair(word, 1));
-        }
-    }
-
-    bool search(string word) {
-	map<string, int>::iterator i = dictionary -> find(word);
-	if (i == dictionary -> end()) {
-		return false;
-	} else {
-		return true;
-	}
-    }
-};
-
- class NaiveCorrector
-{
-    WordDictionary *dict;
-    map<string, string> *knownCorrectionsMap;
-
-    public:
-        NaiveCorrector(string pathToDict, string knownCorrectionsMapFile)
+    edb::edb(string pathToDict, string knownCorrectionsMapFile)
         {
             knownCorrectionsMap = new map<string, string>();
             fillKnownCorrections(knownCorrectionsMapFile.c_str());
@@ -51,7 +9,7 @@ class WordDictionary
 
         }
 
-    set<string> *correct(char *w)
+    set<string>* edb::correct(char *w)
     {
         char *res;
         set<string> *listOfWords = new set<string>();
@@ -69,11 +27,8 @@ class WordDictionary
         singleInsertion(w, listOfWords);
         return listOfWords;
     }
-            
-
-    private :
         
-    void fillKnownCorrections(const char *pathToFile)
+    void edb::fillKnownCorrections(const char *pathToFile)
     {
         ifstream f(pathToFile);
         if(!f) {
@@ -89,7 +44,7 @@ class WordDictionary
     }
 
     //check if the word is a known error
-    bool checkIfKnown(string w) 
+    bool edb::checkIfKnown(string w) 
     {
 	map<string, string>::iterator i = knownCorrectionsMap -> find(w);
 	if (i == knownCorrectionsMap -> end()) {
@@ -99,7 +54,7 @@ class WordDictionary
 	}
     }
 
-    void oneDistanceReplacement(string str, set<string> *listOfWords) 
+    void edb::oneDistanceReplacement(string str, set<string> *listOfWords) 
     {
             char replacement[] = {"abcdefghijklmnopqrstuvwxyz"};
             int l = str.length();
@@ -118,7 +73,7 @@ class WordDictionary
             }
         }
 
-        void twoDistanceReplacement(char *str, set<string> *listOfWords) 
+        void edb::twoDistanceReplacement(char *str, set<string> *listOfWords) 
         {
             char replacement[] = {"abcdefghijklmnopqrstuvwxyz"};
             int l = strlen(str);
@@ -136,7 +91,7 @@ class WordDictionary
         }
 
         //deletes one character at index pos
-        char* deleteChar(char *str, int pos) 
+        char* edb::deleteChar(char *str, int pos) 
         {
             int l = strlen(str);
             char *strc = new char[l];
@@ -149,7 +104,7 @@ class WordDictionary
             return strc;
         }
 
-        void singleDeletion(char *str, set<string> *listOfWords) 
+        void edb::singleDeletion(char *str, set<string> *listOfWords) 
         {
             char *res;
             int l = strlen(str);
@@ -162,7 +117,7 @@ class WordDictionary
             }
         }
         
-        char *insertCharAt(char *str, int pos, char c)
+        char *edb::insertCharAt(char *str, int pos, char c)
         {
             int l = strlen(str);
             char *mod = new char[l + 2];
@@ -178,7 +133,7 @@ class WordDictionary
             return mod;
         }
 
-        void singleInsertion(char *str, set<string> *listOfWords)
+        void edb::singleInsertion(char *str, set<string> *listOfWords)
         {
             char alphabet[] = {"abcdefghijklmnopqrstuvwxyz"};
             char *res;
@@ -192,13 +147,12 @@ class WordDictionary
                 } 
             }
         }
-        ~NaiveCorrector()
+        edb::~edb()
         {
             delete knownCorrectionsMap;
             delete dict;
         }
 
-};
 
        
 
@@ -206,7 +160,7 @@ int main(int argc, char *argv[])
 {
     string wordListPath("../data/wordlist.txt");
     string knownCorrectionsFile("../data/knowncorrections.txt");
-    NaiveCorrector *nc = new NaiveCorrector(wordListPath, knownCorrectionsFile);
+    edb *nc = new edb(wordListPath, knownCorrectionsFile);
     char input[40];
     set<string> *corrections;
     while(strcmp(input, "bye")) {
