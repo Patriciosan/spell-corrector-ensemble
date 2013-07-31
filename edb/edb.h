@@ -7,6 +7,8 @@
 #include <map>
 #include <vector>
 #include "WordDictionary.h"
+#include "FrequencyCounter.h"
+
 using namespace std;
 class edb
 {
@@ -15,7 +17,7 @@ class edb
 
     public:
     edb(string pathToDict, string knownCorrectionsMapFile);
-    set<string> *correct(char *w);
+    set<string> *correct(char *w,int priority);
     private :
     void fillKnownCorrections(const char *pathToFile);
     //check if the word is a known error
@@ -30,3 +32,4 @@ class edb
 };
 
        
+
