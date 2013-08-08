@@ -85,6 +85,21 @@ def createMatrices(errorCorrectFileName):
                     so, icw[i - 1] was written instead of cw[i - 1],cw[i]'''
                     if(ri >= 0 and ri <= 25 and ci >= 0 and ci <= 25):
                         ins[ri][ci] += 1
-
-
+    tCount = 0
+    iCount = 0
+    sCount = 0
+    dCount = 0
+    for i in range(26):
+        for j in range(26):
+            tCount += trans[i][j]
+            dCount += de[i][j]
+            sCount += subs[i][j]
+            iCount += ins[i][j]
+    for i in range(26):
+        for j in range(26):
+            trans[i][j] = float(trans[i][j]) / tCount
+            subs[i][j] = float(subs[i][j]) / sCount
+            ins[i][j] = float(ins[i][j]) / iCount
+            de[i][j] = float(de[i][j]) / dCount
+    #print tCount, dCount, iCount, sCount
     return {'subs':subs, 'trans':trans, 'del':de, 'ins':ins}
