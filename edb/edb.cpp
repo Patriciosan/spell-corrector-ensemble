@@ -23,12 +23,13 @@ set<string>* edb::correct(char *w, int priority) {
 	if (priority == 1) {
 		oneDistanceReplacement(w, listOfWords);
 	} else if (priority == 2) {
-		singleInsertion(w, listOfWords);
-		
+		twoDistanceReplacement(w, listOfWords);
 	} else if (priority == 3) {
 		singleDeletion(w, listOfWords);
 	} else if (priority == 4) {
-		twoDistanceReplacement(w, listOfWords);
+		singleInsertion(w, listOfWords);
+	} else if (priority == 5) {
+		transpose(w, listOfWords);
 	}
 	return listOfWords;
 }
@@ -171,28 +172,34 @@ void printCorrections(set<string> *correction, int priority) {
 
 }
 
-
-
-
-
-
 int main(int argc, char *argv[]) {
 	string wordListPath("../data/wordlist.txt");
 	string knownCorrectionsFile("../data/knowncorrections.txt");
 	edb *nc = new edb(wordListPath, knownCorrectionsFile);
 	char input[40];
+	int flag=0;
 	set<string> *corrections =new set<string>();
-	while (1) {
-		cout << endl<<endl<<"Enter the Word (q for Exit): ";
+	string labels[] = {"", "OneDistanceReplacement Corrections", "TwoDistanceReplacement Corrections", "Single Deletions Corrections", "Single Insertions Corrections", "Transpose corrections"};
+
+    while(1)
+    {
+		cout << "Enter the Word (q for Exit): ";
 		cin >> input;
 		if(strcmp(input,"q") && strcmp(input,"Q"))
 		{
-		for (int i = 1; i <= 4; i++) {
+		for (int i = 1; i <= 5; i++) {
 			
 			corrections = nc->correct(input, i);
+			if (corrections->size() == 0 && flag==0) {
+				cout << "No Suggestions in this category \n";
+				corrections->clear();
+				continue;
+			}
+			
+			flag=1;	
+            cout << labels[i] << endl;
 			getHighestFrequencyCountWord(*corrections, i);
 			corrections->clear();
-				
 			}
 		}
 		else

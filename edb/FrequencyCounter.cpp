@@ -88,17 +88,6 @@ void getHighestFrequencyCountWord(set<string> correctList,int priority) {
 	set<WordDetails>::iterator iter;
 
 	string correctWord = "";
-
-	if (priority == 1) {
-		cout << endl<<endl << "**********One Distance Replacement Corrections***********"<<endl<<endl;
-	} else if (priority == 2) {
-		cout << endl <<endl<< "**********Single Insertions Corrections***********"<<endl<<endl;
-	} else if (priority == 3) {
-		cout << endl <<endl<< "**********Single Deletions Corrections***********"<<endl<<endl;
-	} else if (priority == 4) {
-		cout << endl <<endl <<"**********Two Distance Replacement Corrections******"<<endl<<endl;
-	}
-
 	if(correctList.size() > 0)
 	{
 		int rank=0;
