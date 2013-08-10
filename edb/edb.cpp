@@ -159,10 +159,11 @@ int main(int argc, char *argv[]) {
 	char input[40];
 	int flag=0;
 	set<string> *corrections =new set<string>();
-	while (strcmp(input, "bye")) {
-		cout << "> ";
+	while (1) {
+		cout << "Enter the Word (q for Exit): ";
 		cin >> input;
-	
+		if(strcmp(input,"q") && strcmp(input,"Q"))
+		{
 		for (int i = 1; i <= 4; i++) {
 			
 			corrections = nc->correct(input, i);
@@ -176,10 +177,15 @@ int main(int argc, char *argv[]) {
 			getHighestFrequencyCountWord(*corrections, i);
 			corrections->clear();
 				
+			}
+		}
+		else
+		{
+			return 0;
 		}
 
 	}
-	cout << "bye\n";
+	
 	return 0;
 
 }
