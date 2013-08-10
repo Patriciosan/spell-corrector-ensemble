@@ -31,6 +31,7 @@ def frequencyDist(fileName):
         dist[word] = dist[word] / total
     
     return dist
+
 def edits1(word):
    alphabet = 'abcdefghijklmnopqrstuvwxyz'
    splits     = [(word[:i], word[i:]) for i in range(len(word) + 1)]
@@ -45,6 +46,8 @@ def main(argv):
     suggestedSentence = ''
     wordSet = makeSet("../data/wordlist.txt")
     matrixDict = createMatrices("se.txt")
+    char = matrixDict['char']
+    charBi = matrixDict['charBi']
     fdist = frequencyDist("../data/big.txt")
     '''if(!os.path.isfile("fdist.txt")):
         createFrequencyDistFile("../data/big.txt", "fdist.txt")
@@ -56,52 +59,25 @@ def main(argv):
         for k in candidatesDict.keys():
             if(iw in candidatesDict[k]):
                 candidatesDict[k].remove(iw)
-        #process all the substitutions:
-        for word in candidatesDict['subs']:
-            if(word in wordSet):
-                index = findSubstituionChar(word, iw)
-                ri = ord(index[0]) - 97
-                ci = ord(index[1]) - 97
-                operP = matrixDict['subs'][ri][ci]
-                prior = fdist[word]
-                results[word] = prior * operP
-                #print word, operP, prior, prior * operP
-    
-        #process all the transpositions:
-        for word in candidatesDict['trans']:
-            if(word in wordSet):
-                index = findTranspositionChar(word, iw)
-                ri = ord(index[0]) - 97
-                ci = ord(index[1]) - 97
-                operP = matrixDict['trans'][ri][ci]
-                prior = fdist[word]
-                results[word] = prior * operP
-                #print word, operP, prior, prior * operP
 
-        #process all the deletions:
-        for word in candidatesDict['del']:
-            if(word in wordSet):
-                index = findInsertionChar(word, iw)
-                ri = ord(index[0]) - 97
-                ci = ord(index[1]) - 97
-                operP = matrixDict['del'][ri][ci]
-                prior = fdist[word]
-                results[word] = prior * operP
-                #print word, operP, prior, prior * operP
-    
-        
-        #process all the insertions:
-        for word in candidatesDict['ins']:
-            if(word in wordSet):
-                index = findDeletionChar(word, iw)
-                ri = ord(index[0]) - 97
-                ci = ord(index[1]) - 97
-                operP = matrixDict['ins'][ri][ci]
-                prior = fdist[word]
-                results[word] = prior * operP
-                #print word, operP, prior, prior * operP
-        
-        dispResults(results, fdist)
+        findFuncs = {'subs':findSubstituionChar, 'trans':findTranspositionChar, 'del':findInsertionChar,
+                    'ins':findDeletionChar}
+
+        index  = ['subs', 'trans', 'del', 'ins']
+        total = 0
+        for i in index:
+            for word in candidatesDict[i]:
+                if(word in wordSet):
+                    index = findFuncs[i](word, iw)
+                    bigram = index[0] + index[1]
+                    ri = ord(index[0]) - 97
+                    ci = ord(index[1]) - 97
+                    operP = matrixDict[i][ri][ci]
+                    prior = fdist[word]
+                    results[word] = prior * operP
+                    total += prior * operP
+                    #print word, operP, prior, prior * operP
+        dispResults(results, fdist, total)
         suggestedSentence += (max(results, key = results.get) + ' ')
     
     print suggestedSentence
@@ -130,15 +106,15 @@ def createfrequencydistfile(wordfilename, ofilename):
     ffile.close()
     return dist 
 
-def dispResults(results, fdist):
+def dispResults(results, fdist, total):
 
-    print "\n\n%-10s %-20s %-20s %-20s\n" %("Word", "p(c|w)", "p(w)", "p(w) * p(c|w)") 
+    print "\n\n%-10s %-20s %-20s %-20s%-20s\n" %("Word", "p(c|w)", "p(w)", "p(w) * p(c|w)", "Score") 
     for k in sorted(results, key = results.get, reverse = True):
         prior = fdist[k]
         pro = results[k]
         if(prior == 0):
             continue
-        print "%-10s %-.18f %-.18f %-.18f"  %(k, pro / prior, prior, pro)
+        print "%-10s %-.15f %-.15f %-.15f %-.5f %%"  %(k, pro / prior, prior, results[k], (results[k] / total) * 100)
     print '\n\n'
 def findDeletionChar(cw, icw):
     i = 0
