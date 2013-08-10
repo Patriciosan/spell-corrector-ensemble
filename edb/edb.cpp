@@ -94,14 +94,13 @@ void edb::twoDistanceReplacement(char *str, set<string> *listOfWords) {
 
 void edb::transpose(char *str, set<string> *listOfWords) {
 	int l = strlen(str);
-	char *strc = new char[l];
     char temp;
 	for (int i = 0; i < l - 1; i++) { //for each character
         temp = str[i];
         str[i] = str[i + 1];
         str[i + 1] = temp;
-	    if (dict->search(strc)) {
-            listOfWords->insert(string(strc));
+	    if (dict->search(str)) {
+            listOfWords->insert(string(str));
         }
         temp = str[i];
         str[i] = str[i + 1];
