@@ -1,6 +1,7 @@
 //sg
 #include "edb.h"
 #include "FrequencyCounter.h"
+#include "BigramProbModel.h"
 
 using namespace std;
 edb::edb(string pathToDict, string knownCorrectionsMapFile) {
@@ -177,6 +178,8 @@ int main(int argc, char *argv[]) {
 	edb *nc = new edb(wordListPath, knownCorrectionsFile);
 	char input[40];
 	int flag=0;
+    BigramProbModel bp(string("../data/bicount.txt"));
+
 	set<string> *corrections =new set<string>();
 	string labels[] = {"", "OneDistanceReplacement Corrections", "TwoDistanceReplacement Corrections", "Single Deletions Corrections", "Single Insertions Corrections", "Transpose corrections"};
 
@@ -189,6 +192,7 @@ int main(int argc, char *argv[]) {
 		for (int i = 1; i <= 5; i++) {
 			
 			corrections = nc->correct(input, i);
+            /*
 			if (corrections->size() == 0 && flag==0) {
 				cout << "No Suggestions in this category \n";
 				corrections->clear();
@@ -197,7 +201,12 @@ int main(int argc, char *argv[]) {
 			
 			flag=1;	
             cout << labels[i] << endl;
-			getHighestFrequencyCountWord(*corrections, i);
+			
+            
+            getHighestFrequencyCountWord(*corrections, i);*/
+            for(set<string>::iterator it = corrections -> begin(); it != corrections -> end(); it++) {
+                cout << *it << "  " << bp.wordProb(*it) << endl;
+            }
 			corrections->clear();
 			}
 		}
