@@ -28,6 +28,7 @@ class edb
     void singleDeletion(char *str, set<string> *listOfWords);
     char *insertCharAt(char *str, int pos, char c);
     void singleInsertion(char *str, set<string> *listOfWords);
+    void transpose(char *, set<string> *listOfWords);
     ~edb();
 };
 
