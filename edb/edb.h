@@ -16,8 +16,9 @@ class edb
     map<string, string> *knownCorrectionsMap;
 
     public:
+    enum OPTYPE  {INS = 1, DEL, SUBS, TRANS, SUBS2};
     edb(string pathToDict, string knownCorrectionsMapFile);
-    set<string> *correct(char *w,int priority);
+    set<string> *correct(char *w, OPTYPE);
     private :
     void fillKnownCorrections(const char *pathToFile);
     //check if the word is a known error

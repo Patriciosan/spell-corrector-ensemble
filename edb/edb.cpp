@@ -2,7 +2,6 @@
 #include "edb.h"
 #include "FrequencyCounter.h"
 #include "BigramProbModel.h"
-
 using namespace std;
 edb::edb(string pathToDict, string knownCorrectionsMapFile) {
 	knownCorrectionsMap = new map<string, string>();
@@ -11,7 +10,7 @@ edb::edb(string pathToDict, string knownCorrectionsMapFile) {
 
 }
 
-set<string>* edb::correct(char *w, int priority) {
+set<string>* edb::correct(char *w, OPTYPE op) {
 	char *res;
 	set<string> *listOfWords = new set<string>();
 
@@ -21,15 +20,15 @@ set<string>* edb::correct(char *w, int priority) {
 	}
 
 	//if the correction is known, simply return it
-	if (priority == 1) {
+	if (op == edb::SUBS) {
 		oneDistanceReplacement(w, listOfWords);
-	} else if (priority == 2) {
+	} else if (op == edb::SUBS2) {
 		twoDistanceReplacement(w, listOfWords);
-	} else if (priority == 3) {
+	} else if (op == edb::DEL) {
 		singleDeletion(w, listOfWords);
-	} else if (priority == 4) {
+	} else if (op == edb::INS) {
 		singleInsertion(w, listOfWords);
-	} else if (priority == 5) {
+	} else if (op == edb::TRANS) {
 		transpose(w, listOfWords);
 	}
 	return listOfWords;
@@ -168,7 +167,7 @@ edb::~edb() {
 	delete dict;
 }
 
-void printCorrections(set<string> *correction, int priority) {
+void printCorrections(set<string> *correction, int op) {
 
 }
 
@@ -180,18 +179,24 @@ int main(int argc, char *argv[]) {
 	int flag=0;
     BigramProbModel bp(string("../data/bicount.txt"));
 
-	set<string> *corrections =new set<string>();
+	set<string> *ins =new set<string>();
+	set<string> *dels =new set<string>();
+	set<string> *trans =new set<string>();
+	set<string> *subs =new set<string>();
+	set<string> *subs2 =new set<string>();
 	string labels[] = {"", "OneDistanceReplacement Corrections", "TwoDistanceReplacement Corrections", "Single Deletions Corrections", "Single Insertions Corrections", "Transpose corrections"};
 
     while(1)
     {
 		cout << "Enter the Word (q for Exit): ";
 		cin >> input;
-		if(strcmp(input,"q") && strcmp(input,"Q"))
-		{
-		for (int i = 1; i <= 5; i++) {
-			
-			corrections = nc->correct(input, i);
+		if(strcmp(input,"q") && strcmp(input,"Q")) {
+            /*FILL ALL THE SETS*/
+			ins = nc->correct(input, edb::INS);
+			dels = nc->correct(input, edb::DEL);
+			subs = nc->correct(input, edb::SUBS);
+			trans = nc->correct(input, edb::TRANS);
+			subs2 = nc->correct(input, edb::SUBS2);
             /*
 			if (corrections->size() == 0 && flag==0) {
 				cout << "No Suggestions in this category \n";
@@ -204,19 +209,15 @@ int main(int argc, char *argv[]) {
 			
             
             getHighestFrequencyCountWord(*corrections, i);*/
-            for(set<string>::iterator it = corrections -> begin(); it != corrections -> end(); it++) {
+            for(set<string>::iterator it = ins -> begin(); it != ins -> end(); it++) {
                 cout << *it << "  " << bp.wordProb(*it) << endl;
             }
-			corrections->clear();
 			}
-		}
-		else
-		{
+		
+		 else {
 			return 0;
-		}
-
-	}
-	
+		 }
+    }
 	return 0;
 
 }
