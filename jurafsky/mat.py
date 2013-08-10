@@ -26,6 +26,16 @@ def createMatrices(errorCorrectFileName):
             continue
         
         cw = entrySplit[0].strip().lower()
+        from collections import defaultdict
+        charBi = defaultdict(lambda:1) #bigram frequency
+        char = defaultdict(lambda:1) #char frquency
+        bigrams = (cw[i] + cw[i + 1] for i in range(len(cw) - 1))
+        for bg in bigrams:
+            charBi[bg] += 1
+            char[bg[0]] += 1
+        char[cw[len(cw) - 1]] += 1
+
+
         icwl = entrySplit[1].split(',')
     
         for icw in icwl:
@@ -89,6 +99,10 @@ def createMatrices(errorCorrectFileName):
     iCount = 0
     sCount = 0
     dCount = 0
+    ''' 
+    There are 2 ways in which the scores can be normalized, one is dividing each score by total number of
+    that operations.
+    '''
     for i in range(26):
         for j in range(26):
             tCount += trans[i][j]
@@ -101,5 +115,38 @@ def createMatrices(errorCorrectFileName):
             subs[i][j] = float(subs[i][j]) / sCount
             ins[i][j] = float(ins[i][j]) / iCount
             de[i][j] = float(de[i][j]) / dCount
+    
+    transMatFile = open("transMatFile.txt", "w")
+    subsFile = open("subsFile.txt", "w")
+    insFile = open("insFile.txt", "w")
+    deFile = open("deFile.txt", "w")
+
+    for i in range(26):
+        transMatFile.write(str(trans[i]) + "\n" )
+        subsFile.write(str(subs[i]) + "\n")
+        insFile.write(str(ins[i]) + "\n")
+        deFile.write(str(de[i]) + "\n")
+    
+    transMatFile.close()
+    subsFile.close()
+    insFile.close()
+    deFile.close()
+            
+            
+
+
+    '''normalization way #2 : Taken from Kernighan, church, gale 1990'''
+    '''
+    alphabet = "abcdefghijklmnopqrstuvwxyz"
+    for c1 in alphabet:
+        for c2 in alphabet:
+            ri = ord(c1) - 97 #row index
+            ci = ord(c2) - 97 #column index
+            de[ri][ci] = float(de[ri][ci]) / charBi[c1 + c2] 
+            trans[ri][ci] = float(trans[ri][ci]) / charBi[c1 + c2] 
+            subs[ri][ci] = float(subs[ri][ci]) / char[c1] 
+            ins[ri][ci] = float(ins[ri][ci]) / char[c1] 
+                    
+    '''
     #print tCount, dCount, iCount, sCount
-    return {'subs':subs, 'trans':trans, 'del':de, 'ins':ins}
+    return {'subs':subs, 'trans':trans, 'del':de, 'ins':ins, 'charBi':charBi, 'char':char}

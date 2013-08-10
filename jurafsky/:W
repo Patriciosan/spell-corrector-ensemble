@@ -46,8 +46,6 @@ def main(argv):
     suggestedSentence = ''
     wordSet = makeSet("../data/wordlist.txt")
     matrixDict = createMatrices("se.txt")
-    char = matrixDict['char']
-    charBi = matrixDict['charBi']
     fdist = frequencyDist("../data/big.txt")
     '''if(!os.path.isfile("fdist.txt")):
         createFrequencyDistFile("../data/big.txt", "fdist.txt")
@@ -64,18 +62,15 @@ def main(argv):
                     'ins':findDeletionChar}
 
         index  = ['subs', 'trans', 'del', 'ins']
-        total = 0
         for i in index:
             for word in candidatesDict[i]:
                 if(word in wordSet):
                     index = findFuncs[i](word, iw)
-                    bigram = index[0] + index[1]
                     ri = ord(index[0]) - 97
                     ci = ord(index[1]) - 97
                     operP = matrixDict[i][ri][ci]
                     prior = fdist[word]
                     results[word] = prior * operP
-                    total += prior * operP
                     #print word, operP, prior, prior * operP
         dispResults(results, fdist, total)
         suggestedSentence += (max(results, key = results.get) + ' ')
@@ -106,15 +101,15 @@ def createfrequencydistfile(wordfilename, ofilename):
     ffile.close()
     return dist 
 
-def dispResults(results, fdist, total):
+def dispResults(results, fdist):
 
-    print "\n\n%-10s %-20s %-20s %-20s%-20s\n" %("Word", "p(c|w)", "p(w)", "p(w) * p(c|w)", "Score") 
+    print "\n\n%-10s %-20s %-20s %-20s\n" %("Word", "p(c|w)", "p(w)", "p(w) * p(c|w)") 
     for k in sorted(results, key = results.get, reverse = True):
         prior = fdist[k]
         pro = results[k]
         if(prior == 0):
             continue
-        print "%-10s %-.15f %-.15f %-.15f %-.5f %%"  %(k, pro / prior, prior, results[k], (results[k] / total) * 100)
+        print "%-10s %-.18f %-.18f %-.18f"  %(k, pro / prior, prior, pro)
     print '\n\n'
 def findDeletionChar(cw, icw):
     i = 0
