@@ -82,8 +82,7 @@ void countFrequency(set<string> correctedWordSet) {
 
 void getHighestFrequencyCountWord(set<string> correctList,int priority) {
 
-	if(correctList.size() > 0)
-	{
+	
 	countFrequency(correctList);
 
 	set<WordDetails>::iterator iter;
@@ -91,26 +90,33 @@ void getHighestFrequencyCountWord(set<string> correctList,int priority) {
 	string correctWord = "";
 
 	if (priority == 1) {
-		cout << endl << "OneDistanceReplacement Corrections"<<endl;
+		cout << endl<<endl << "**********One Distance Replacement Corrections***********"<<endl<<endl;
 	} else if (priority == 2) {
-		cout << endl << "TwoDistanceReplacement Corrections"<<endl;
+		cout << endl <<endl<< "**********Single Insertions Corrections***********"<<endl<<endl;
 	} else if (priority == 3) {
-		cout << endl << "Single Deletions Corrections"<<endl;
+		cout << endl <<endl<< "**********Single Deletions Corrections***********"<<endl<<endl;
 	} else if (priority == 4) {
-		cout << endl << "Single Insertions Corrections"<<endl;
+		cout << endl <<endl <<"**********Two Distance Replacement Corrections******"<<endl<<endl;
 	}
 
-	for (iter = wordsInfo.begin(); iter != wordsInfo.end(); ++iter) {
-		WordDetails words = *iter;
-
-	cout<<iter->word<<"  "<<iter->frequency<<"  "<<iter->probability<<endl;
+	if(correctList.size() > 0)
+	{
+		int rank=0;
+		cout <<"Rank |  Word  |  Frequency  |  Probability"<<endl;
+		cout <<"------------------------------------------"<<endl;
+		for (iter = wordsInfo.begin(); iter != wordsInfo.end(); ++iter) {
+			WordDetails words = *iter;
+			cout<<right<<setw(3)<<++rank<<" |  "<<right<<setw(6)<<iter->word<<"   |  "<<right<<setw(6)<<iter->frequency<<"   |   "<<right<<setw(10)<<iter->probability<<endl;
 		
-	}
-
+		}
+	}else
+	{	
+		
+		cout <<"No Suggestions in this Category "<<endl<<endl;
+	}	
 	wordsInfo.clear();
 
 	}
-}
 
 
 
