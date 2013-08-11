@@ -54,36 +54,41 @@ def main(argv):
 
     The candidates dict has a set for each type of mistakes that can happen'''
 
-    for iw in argv[1:]:
-        candidatesDict = edits1(iw)
-        results = {}
-        for k in candidatesDict.keys():
-            if(iw in candidatesDict[k]):
-                candidatesDict[k].remove(iw)
-
-        findFuncs = {'subs':findSubstituionChar, 'trans':findTranspositionChar, 'del':findInsertionChar,
-                    'ins':findDeletionChar}
-
-        index  = ['subs', 'trans', 'del', 'ins']
-        total = 0
-        for i in index:
-            for word in candidatesDict[i]:
-                if(word in wordSet):
-                    index = findFuncs[i](word, iw)
-                    bigram = index[0] + index[1]
-                    ri = ord(index[0]) - 97
-                    ci = ord(index[1]) - 97
-                    operP = matrixDict[i][ri][ci]
-                    prior = fdist[word]
-                    results[word] = prior * operP
-                    total += prior * operP
-                    #print word, operP, prior, prior * operP
-        if(len(results) == 0):
-            print "No corrections found!"
-            continue
-        dispResults(results, fdist, total)
-        suggestedSentence += (max(results, key = results.get) + ' ')
+    while(1):
+        ip = raw_input("> ")
+        if(ip == "exit"):
+            return
+        for iw in str(ip).split(' '):
+            candidatesDict = edits1(iw)
+            results = {}
+            for k in candidatesDict.keys():
+                if(iw in candidatesDict[k]):
+                    candidatesDict[k].remove(iw)
     
+            findFuncs = {'subs':findSubstituionChar, 'trans':findTranspositionChar, 'del':findInsertionChar,
+                        'ins':findDeletionChar}
+    
+            index  = ['subs', 'trans', 'del', 'ins']
+            total = 0
+            for i in index:
+                for word in candidatesDict[i]:
+                    if(word in wordSet):
+                        index = findFuncs[i](word, iw)
+                        bigram = index[0] + index[1]
+                        ri = ord(index[0]) - 97
+                        ci = ord(index[1]) - 97
+                        operP = matrixDict[i][ri][ci]
+                        prior = fdist[word]
+                        results[word] = prior * operP
+                        total += prior * operP
+                        #print word, operP, prior, prior * operP
+            if(len(results) == 0):
+                print "No corrections found!"
+                continue
+            dispResults(results, fdist, total)
+            suggestedSentence += (max(results, key = results.get) + ' ')
+    
+    end
     print suggestedSentence
 
 
