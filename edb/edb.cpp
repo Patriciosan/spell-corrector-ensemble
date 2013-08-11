@@ -1,16 +1,20 @@
 //sg
 #include "edb.h"
-#include "FrequencyCounter.h"
 #include "BigramProbModel.h"
+#include "FrequencyCountModel.h"
+#include "Ranker.h"
 using namespace std;
-edb::edb(string pathToDict, string knownCorrectionsMapFile) {
+
+edb::edb(string pathToDict, string knownCorrectionsMapFile) 
+{
 	knownCorrectionsMap = new map<string, string>();
 	fillKnownCorrections(knownCorrectionsMapFile.c_str());
 	dict = new WordDictionary(pathToDict);
 
 }
 
-set<string>* edb::correct(char *w, OPTYPE op) {
+set<string>* edb::correct(char *w, OPTYPE op) 
+{
 	char *res;
 	set<string> *listOfWords = new set<string>();
 
@@ -34,7 +38,8 @@ set<string>* edb::correct(char *w, OPTYPE op) {
 	return listOfWords;
 }
 
-void edb::fillKnownCorrections(const char *pathToFile) {
+void edb::fillKnownCorrections(const char *pathToFile) 
+{
 	ifstream f(pathToFile);
 	if (!f) {
 		cout << "File cannot be opened!";
@@ -49,7 +54,8 @@ void edb::fillKnownCorrections(const char *pathToFile) {
 }
 
 //check if the word is a known error
-bool edb::checkIfKnown(string w) {
+bool edb::checkIfKnown(string w) 
+{
 	map<string, string>::iterator i = knownCorrectionsMap->find(w);
 	if (i == knownCorrectionsMap->end()) {
 		return false;
@@ -76,7 +82,8 @@ void edb::oneDistanceReplacement(string str, set<string> *listOfWords) {
 	}
 }
 
-void edb::twoDistanceReplacement(char *str, set<string> *listOfWords) {
+void edb::twoDistanceReplacement(char *str, set<string> *listOfWords) 
+{
 	char replacement[] = { "abcdefghijklmnopqrstuvwxyz" };
 	int l = strlen(str);
 	char *strc = new char[l];
@@ -92,7 +99,8 @@ void edb::twoDistanceReplacement(char *str, set<string> *listOfWords) {
 	}
 }
 
-void edb::transpose(char *str, set<string> *listOfWords) {
+void edb::transpose(char *str, set<string> *listOfWords) 
+{
 	int l = strlen(str);
     char temp;
 	for (int i = 0; i < l - 1; i++) { //for each character
@@ -110,7 +118,8 @@ void edb::transpose(char *str, set<string> *listOfWords) {
 
 
 //deletes one character at index pos
-char* edb::deleteChar(char *str, int pos) {
+char* edb::deleteChar(char *str, int pos) 
+{
 	int l = strlen(str);
 	char *strc = new char[l];
 	strcpy(strc, str);
@@ -122,7 +131,8 @@ char* edb::deleteChar(char *str, int pos) {
 	return strc;
 }
 
-void edb::singleDeletion(char *str, set<string> *listOfWords) {
+void edb::singleDeletion(char *str, set<string> *listOfWords) 
+{
 	char *res;
 	int l = strlen(str);
 	for (int i = 0; i < l; i++) { //for each character
@@ -134,7 +144,8 @@ void edb::singleDeletion(char *str, set<string> *listOfWords) {
 	}
 }
 
-char *edb::insertCharAt(char *str, int pos, char c) {
+char *edb::insertCharAt(char *str, int pos, char c) 
+{
 	int l = strlen(str);
 	char *mod = new char[l + 2];
 	int i = 0;
@@ -149,7 +160,8 @@ char *edb::insertCharAt(char *str, int pos, char c) {
 	return mod;
 }
 
-void edb::singleInsertion(char *str, set<string> *listOfWords) {
+void edb::singleInsertion(char *str, set<string> *listOfWords) 
+{
 	char alphabet[] = { "abcdefghijklmnopqrstuvwxyz" };
 	char *res;
 	int l = strlen(str);
@@ -162,7 +174,8 @@ void edb::singleInsertion(char *str, set<string> *listOfWords) {
 		}
 	}
 }
-edb::~edb() {
+edb::~edb()
+{
 	delete knownCorrectionsMap;
 	delete dict;
 }
@@ -171,25 +184,35 @@ void printCorrections(set<string> *correction, int op) {
 
 }
 
+
 int main(int argc, char *argv[]) {
-	string wordListPath("../data/wordlist.txt");
+	if(argc != 2) {
+        cout << "Usage : ./edb [freq|bigram|help]\n";
+        return 0;
+    }
+    if(!strcmp(argv[1], "help")) {
+        cout << "Start the program by typing $./edb [freq|bigram]\n\n1. freq : The possible corrections are rated by considering which word has appeared most in the dictionary.\n\n2. bigram :Candidates are broken down into bigrams, the individual probabilities are then mulitiplied to get the frequency of the word\n";
+        return 0;
+    }
+    string wordListPath("../data/wordlist.txt");
 	string knownCorrectionsFile("../data/knowncorrections.txt");
 	edb *nc = new edb(wordListPath, knownCorrectionsFile);
 	char input[40];
+
 	int flag=0;
-    BigramProbModel bp(string("../data/bicount.txt"));
+    Ranker *r = new Ranker(string("../data/bicount.txt"), string("../data/out.txt")); 
 
 	set<string> *ins =new set<string>();
 	set<string> *dels =new set<string>();
 	set<string> *trans =new set<string>();
 	set<string> *subs =new set<string>();
 	set<string> *subs2 =new set<string>();
-	string labels[] = {"", "OneDistanceReplacement Corrections", "TwoDistanceReplacement Corrections", "Single Deletions Corrections", "Single Insertions Corrections", "Transpose corrections"};
 
     while(1)
     {
 		cout << "Enter the Word (q for Exit): ";
 		cin >> input;
+        
 		if(strcmp(input,"q") && strcmp(input,"Q")) {
             /*FILL ALL THE SETS*/
 			ins = nc->correct(input, edb::INS);
@@ -197,26 +220,66 @@ int main(int argc, char *argv[]) {
 			subs = nc->correct(input, edb::SUBS);
 			trans = nc->correct(input, edb::TRANS);
 			subs2 = nc->correct(input, edb::SUBS2);
-            /*
-			if (corrections->size() == 0 && flag==0) {
-				cout << "No Suggestions in this category \n";
-				corrections->clear();
-				continue;
-			}
-			
-			flag=1;	
-            cout << labels[i] << endl;
-			
-            
-            getHighestFrequencyCountWord(*corrections, i);*/
+            int wc = 0;
+            std::map<double, string> *scoreString = new std::map<double, string>();
+            double score;
             for(set<string>::iterator it = ins -> begin(); it != ins -> end(); it++) {
-                cout << *it << "  " << bp.wordProb(*it) << endl;
+                score = r -> rank(argv[1], *it) + edb::ISCORE;
+                if(scoreString -> find(score) == scoreString -> end()) { //not found
+                    scoreString->insert(std::make_pair(score, *it));
+                } else {
+                    string temp = scoreString -> find(score) -> second;
+                    scoreString->insert(std::make_pair(score, *it + temp));
+                }
             }
-			}
-		
-		 else {
+
+            for(set<string>::iterator it = dels -> begin(); it != dels -> end(); it++) {
+                score = r -> rank(argv[1], *it) + edb::DSCORE;
+                if(scoreString -> find(score) == scoreString -> end()) { //not found
+                    scoreString->insert(std::make_pair(score, *it));
+                } else {
+                    string temp = scoreString -> find(score) -> second;
+                    scoreString->insert(std::make_pair(score, *it + temp));
+                }
+            }
+
+            for(set<string>::iterator it = trans -> begin(); it != trans -> end(); it++) {
+                score = r -> rank(argv[1], *it) + edb::TRANS;
+                if(scoreString -> find(score) == scoreString -> end()) { //not found
+                    scoreString->insert(std::make_pair(score, *it));
+                } else {
+                    string temp = scoreString -> find(score) -> second;
+                    scoreString->insert(std::make_pair(score, *it + temp));
+                }
+            }
+
+            for(set<string>::iterator it = subs -> begin(); it != subs -> end(); it++) {
+                score = r -> rank(argv[1], *it) + edb::SSCORE;
+                if(scoreString -> find(score) == scoreString -> end()) { //not found
+                    scoreString->insert(std::make_pair(score, *it));
+                } else {
+                    string temp = scoreString -> find(score) -> second;
+                    scoreString->insert(std::make_pair(score, *it + temp));
+                }
+            }
+
+           for(set<string>::iterator it = subs2 -> begin(); it != subs2 -> end(); it++) {
+                score = r -> rank(argv[1], *it) + edb::S2SCORE;
+                if(scoreString -> find(score) == scoreString -> end()) { //not found
+                    scoreString->insert(std::make_pair(score, *it));
+                } else {
+                    string temp = scoreString -> find(score) -> second;
+                    scoreString->insert(std::make_pair(score, *it + temp));
+                }
+            }
+           for(std::map<double, string>::reverse_iterator it = scoreString -> rbegin(); it != scoreString -> rend(); it++) {
+               cout << it -> first << " " << it -> second << endl;
+           }
+
+           //now iterate through the dict and show the probables
+       } else {
 			return 0;
-		 }
+	   }
     }
 	return 0;
 

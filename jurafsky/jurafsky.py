@@ -53,6 +53,7 @@ def main(argv):
         createFrequencyDistFile("../data/big.txt", "fdist.txt")
 
     The candidates dict has a set for each type of mistakes that can happen'''
+
     for iw in argv[1:]:
         candidatesDict = edits1(iw)
         results = {}
@@ -77,6 +78,9 @@ def main(argv):
                     results[word] = prior * operP
                     total += prior * operP
                     #print word, operP, prior, prior * operP
+        if(len(results) == 0):
+            print "No corrections found!"
+            continue
         dispResults(results, fdist, total)
         suggestedSentence += (max(results, key = results.get) + ' ')
     
@@ -116,6 +120,7 @@ def dispResults(results, fdist, total):
             continue
         print "%-10s %-.15f %-.15f %-.15f %-.5f %%"  %(k, pro / prior, prior, results[k], (results[k] / total) * 100)
     print '\n\n'
+
 def findDeletionChar(cw, icw):
     i = 0
     while(i < len(icw) and cw[i] == icw[i]):

@@ -7,7 +7,7 @@
 #include <map>
 #include <vector>
 #include "WordDictionary.h"
-#include "FrequencyCounter.h"
+#include "FrequencyCountModel.h"
 
 using namespace std;
 class edb
@@ -16,7 +16,9 @@ class edb
     map<string, string> *knownCorrectionsMap;
 
     public:
+    static int MAX_CORRECTIONS;
     enum OPTYPE  {INS = 1, DEL, SUBS, TRANS, SUBS2};
+    static double ISCORE, DSCORE, SSCORE, TSCORE, S2SCORE;
     edb(string pathToDict, string knownCorrectionsMapFile);
     set<string> *correct(char *w, OPTYPE);
     private :
@@ -33,5 +35,10 @@ class edb
     ~edb();
 };
 
-       
+int edb::MAX_CORRECTIONS = 100;
+double edb::ISCORE = 1;
+double edb::DSCORE = 1;
+double edb::TSCORE = 0.5;
+double edb::SSCORE = 0.5;
+double edb::S2SCORE = 0.25;
 

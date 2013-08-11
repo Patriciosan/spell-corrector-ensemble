@@ -1,3 +1,7 @@
+#ifndef BIPROBMODEL
+#define BIPROBMODEL
+//sg
+
 //The probalistic model to determine the probability of a bigram
 //P(C) = P(Ci. Ci-1. Ci-2...C1) = P(Ci|Ci-1)*...P(C2|C1)
 #include <iostream>
@@ -22,3 +26,4 @@ class BigramProbModel
     //returns the probability of a word occurring by breaking it into bigrams 
     double wordProb(string word);
 };
+#endif
