@@ -103,6 +103,66 @@ def createMatrices(errorCorrectFileName):
     There are 2 ways in which the scores can be normalized, one is dividing each score by total number of
     that operations.
     '''
+    import sys
+    alphabet = "  a   b   c    d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z"
+    ap = "abcdefghijklmnopqrstuvwxyz"
+    row = ''
+
+    #for j in subs[3]:
+        #row = ' '
+        ##row = row + '%4s' % (j)
+    #print row
+
+    print "%-10s" % "Substitution Matrix"
+    print "\n\n"
+    print alphabet
+    print
+    for i in range(26):
+        sys.stdout.write(ap[i] + ' ')
+        for j in subs[i]:
+            ln = '%-4s' % str(j)
+            sys.stdout.write(ln);#print subs[w]
+        print 
+    print "\n\n"
+    print "%-10s" % "Transposition Matrix"
+    print "\n\n"
+    print alphabet
+    print
+    for i in range(26):
+        sys.stdout.write(ap[i] + ' ')
+        for j in trans[i]:
+            ln = '%-4s' % str(j)
+            sys.stdout.write(ln);#print subs[w]
+        print 
+
+    print "\n\n"
+
+    print "%-10s" % "Insertion Matrix"
+    print "\n\n"
+    print alphabet
+    print
+    for i in range(26):
+        sys.stdout.write(ap[i] + ' ')
+        for j in ins[i]:
+            ln = '%-4s' % str(j)
+            sys.stdout.write(ln);#print subs[w]
+        print 
+
+    print "\n\n"
+
+    print "%-10s" % "Deletion Matrix"
+    print "\n\n"
+    print alphabet
+    print
+    for i in range(26):
+        sys.stdout.write(ap[i] + ' ')
+        for j in de[i]:
+            ln = '%-4s' % str(j)
+            sys.stdout.write(ln);#print subs[w]
+        print 
+
+    print "\n\n"
+
     for i in range(26):
         for j in range(26):
             tCount += trans[i][j]
@@ -133,10 +193,11 @@ def createMatrices(errorCorrectFileName):
     deFile.close()
             
             
+   
 
-
-    '''normalization way #2 : Taken from Kernighan, church, gale 1990'''
     '''
+
+    normalization way #2 : Taken from Kernighan, church, gale 1990
     alphabet = "abcdefghijklmnopqrstuvwxyz"
     for c1 in alphabet:
         for c2 in alphabet:
