@@ -42,17 +42,46 @@ def edits1(word):
    return {'del' : set(deletes), 'trans' : set(transposes), 'subs' : set(substitutions), 'ins' : set(inserts)}
 
 
+def correction(iw, wordSet, matrixDict, fdist):
+#This function returns the correction upon receiving an incorrect word
+    candidatesDict = edits1(iw)
+    results = {}
+    for k in candidatesDict.keys():
+        if(iw in candidatesDict[k]):
+            candidatesDict[k].remove(iw)
+
+    findFuncs = {'subs':findSubstituionChar, 'trans':findTranspositionChar, 'del':findInsertionChar,
+                'ins':findDeletionChar}
+
+    index  = ['subs', 'trans', 'del', 'ins']
+    total = 0
+    for i in index:
+        for word in candidatesDict[i]:
+            if(word in wordSet): #if the proposed correction is at all an English word
+                index = findFuncs[i](word, iw)
+                bigram = index[0] + index[1]
+                ri = ord(index[0]) - 97
+                ci = ord(index[1]) - 97
+                operP = matrixDict[i][ri][ci]
+                prior = fdist[word]
+                results[word] = prior * operP
+                total += prior * operP
+                #print word, operP, prior, prior * operP
+    if(len(results) == 0):
+        print "No corrections found!"
+    print max(results, key = results.get)
+
+
 def main(argv):
-    suggestedSentence = ''
     wordSet = makeSet("../data/wordlist.txt")
     matrixDict = createMatrices("se.txt")
     char = matrixDict['char']
     charBi = matrixDict['charBi']
     fdist = frequencyDist("../data/big.txt")
-    '''if(!os.path.isfile("fdist.txt")):
-        createFrequencyDistFile("../data/big.txt", "fdist.txt")
 
-    The candidates dict has a set for each type of mistakes that can happen'''
+    '''   The candidates dict has a set for each type of mistakes that can happen'''
+    correction("agaii", wordSet, matrixDict, fdist)
+    return
 
     while(1):
         ip = raw_input("> ")
@@ -79,17 +108,14 @@ def main(argv):
                         ci = ord(index[1]) - 97
                         operP = matrixDict[i][ri][ci]
                         prior = fdist[word]
-                        results[word] = prior * operP
-                        total += prior * operP
+                        results[word] = prior * operP #score of the word
+                        total += prior * operP #simply the total score of each word to give a score out of 100 at last
                         #print word, operP, prior, prior * operP
             if(len(results) == 0):
                 print "No corrections found!"
                 continue
             dispResults(results, fdist, total)
-            suggestedSentence += (max(results, key = results.get) + ' ')
-    
     end
-    print suggestedSentence
 
 
 

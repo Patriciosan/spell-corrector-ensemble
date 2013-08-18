@@ -5,7 +5,41 @@
 #Egsuppose we have "affort" wrongly typed as "afforr" will cause subs[t, r] += 1
 #the value trans[x, y] is the number of times "xy" was written as "yx".
 #Eg, "would" typed as "woudl" will cause trans[l][d] += 1
-def createMatrices(errorCorrectFileName):
+def printMatrix(mat, name):
+    import sys
+    alphabet = "  a   b   c    d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z"
+    ap = "abcdefghijklmnopqrstuvwxyz"
+
+    print "%-10s" % name
+    print "\n\n"
+    print alphabet
+    print
+    for i in range(26):
+        sys.stdout.write(ap[i] + ' ')
+        for j in mat[i]:
+            ln = '%-4s' % str(j)
+            sys.stdout.write(ln)
+        print 
+    print "\n\n"
+
+def dumpMatrices(trans, subs, ins, de):
+    transMatFile = open("transMatFile.txt", "w")
+    subsFile = open("subsFile.txt", "w")
+    insFile = open("insFile.txt", "w")
+    deFile = open("deFile.txt", "w")
+
+    for i in range(26):
+        transMatFile.write(str(trans[i]) + "\n" )
+        subsFile.write(str(subs[i]) + "\n")
+        insFile.write(str(ins[i]) + "\n")
+        deFile.write(str(de[i]) + "\n")
+    
+    transMatFile.close()
+    subsFile.close()
+    insFile.close()
+    deFile.close()
+     
+def createMatrices(errorCorrectFileName, printMats):
     
     correctionFile = open(errorCorrectFileName, "r")
     
@@ -103,65 +137,11 @@ def createMatrices(errorCorrectFileName):
     There are 2 ways in which the scores can be normalized, one is dividing each score by total number of
     that operations.
     '''
-    import sys
-    alphabet = "  a   b   c    d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z"
-    ap = "abcdefghijklmnopqrstuvwxyz"
-    row = ''
-
-    #for j in subs[3]:
-        #row = ' '
-        ##row = row + '%4s' % (j)
-    #print row
-
-    print "%-10s" % "Substitution Matrix"
-    print "\n\n"
-    print alphabet
-    print
-    for i in range(26):
-        sys.stdout.write(ap[i] + ' ')
-        for j in subs[i]:
-            ln = '%-4s' % str(j)
-            sys.stdout.write(ln);#print subs[w]
-        print 
-    print "\n\n"
-    print "%-10s" % "Transposition Matrix"
-    print "\n\n"
-    print alphabet
-    print
-    for i in range(26):
-        sys.stdout.write(ap[i] + ' ')
-        for j in trans[i]:
-            ln = '%-4s' % str(j)
-            sys.stdout.write(ln);#print subs[w]
-        print 
-
-    print "\n\n"
-
-    print "%-10s" % "Insertion Matrix"
-    print "\n\n"
-    print alphabet
-    print
-    for i in range(26):
-        sys.stdout.write(ap[i] + ' ')
-        for j in ins[i]:
-            ln = '%-4s' % str(j)
-            sys.stdout.write(ln);#print subs[w]
-        print 
-
-    print "\n\n"
-
-    print "%-10s" % "Deletion Matrix"
-    print "\n\n"
-    print alphabet
-    print
-    for i in range(26):
-        sys.stdout.write(ap[i] + ' ')
-        for j in de[i]:
-            ln = '%-4s' % str(j)
-            sys.stdout.write(ln);#print subs[w]
-        print 
-
-    print "\n\n"
+    if(printMats == 1):
+        printMatrix(trans, "Transposition Matrix")
+        printMatrix(ins, "Insertion Matrix")
+        printMatrix(de, "Deletion Matrix")
+        printMatrix(subs, "Substitution Matrix")
 
     for i in range(26):
         for j in range(26):
@@ -169,32 +149,19 @@ def createMatrices(errorCorrectFileName):
             dCount += de[i][j]
             sCount += subs[i][j]
             iCount += ins[i][j]
+
     for i in range(26):
         for j in range(26):
             trans[i][j] = float(trans[i][j]) / tCount
             subs[i][j] = float(subs[i][j]) / sCount
             ins[i][j] = float(ins[i][j]) / iCount
             de[i][j] = float(de[i][j]) / dCount
-    
-    transMatFile = open("transMatFile.txt", "w")
-    subsFile = open("subsFile.txt", "w")
-    insFile = open("insFile.txt", "w")
-    deFile = open("deFile.txt", "w")
 
-    for i in range(26):
-        transMatFile.write(str(trans[i]) + "\n" )
-        subsFile.write(str(subs[i]) + "\n")
-        insFile.write(str(ins[i]) + "\n")
-        deFile.write(str(de[i]) + "\n")
     
-    transMatFile.close()
-    subsFile.close()
-    insFile.close()
-    deFile.close()
-            
+           
             
    
-
+    dumpMatrices(trans, subs, ins, de)
     '''
 
     normalization way #2 : Taken from Kernighan, church, gale 1990
