@@ -14,7 +14,7 @@ build/BigramProbModel.o : BigramProbModel.cpp BigramProbModel.h
 	g++ -c BigramProbModel.cpp -lgmpxx -lgmp && mv *.o build
 
 build/Ranker.o :Ranker.cpp Ranker.h
-	g++ -c Ranker.cpp
+	g++ -c Ranker.cpp && mv *.o build
 
 clean:
 	rm build/*.o

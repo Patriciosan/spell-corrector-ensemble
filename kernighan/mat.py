@@ -161,10 +161,11 @@ def createMatrices(errorCorrectFileName, printMats):
            
             
    
-    dumpMatrices(trans, subs, ins, de)
-    '''
+   #dumpMatrices(trans, subs, ins, de)
+    
 
-    normalization way #2 : Taken from Kernighan, church, gale 1990
+   #normalization way #2 : Taken from Kernighan, church, gale 1990
+    '''
     alphabet = "abcdefghijklmnopqrstuvwxyz"
     for c1 in alphabet:
         for c2 in alphabet:
@@ -174,7 +175,6 @@ def createMatrices(errorCorrectFileName, printMats):
             trans[ri][ci] = float(trans[ri][ci]) / charBi[c1 + c2] 
             subs[ri][ci] = float(subs[ri][ci]) / char[c1] 
             ins[ri][ci] = float(ins[ri][ci]) / char[c1] 
-                    
-    '''
+    '''                
     #print tCount, dCount, iCount, sCount
     return {'subs':subs, 'trans':trans, 'del':de, 'ins':ins, 'charBi':charBi, 'char':char}

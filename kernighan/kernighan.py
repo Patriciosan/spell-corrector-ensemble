@@ -10,10 +10,10 @@ class Kernighan:
     wordSet = set([])
     matrixDict = {}
     fdist = {}
-    def __init__(self):
-        self.wordSet = self.makeSet("../data/wordlist.txt")
-        self.matrixDict = createMatrices("se.txt", 0)
-        self.fdist = self.frequencyDist("../data/big.txt")
+    def __init__(self, trainFile):
+        self.wordSet = self.makeSet("data/wordlist.txt")
+        self.matrixDict = createMatrices(trainFile, 0)
+        self.fdist = self.frequencyDist("data/big.txt")
          
     def makeSet(self, fileName):
         return set(line.strip() for line in open(str(fileName)))
@@ -48,6 +48,8 @@ class Kernighan:
     
     def correction(self, iw):
     #This function returns the correction upon receiving an incorrect word
+        if(iw in self.wordSet):
+            return "dw"
         candidatesDict = self.edits1(iw)
         results = {}
         for k in candidatesDict.keys():
@@ -62,7 +64,8 @@ class Kernighan:
         for i in operations:
             for word in candidatesDict[i]:
                 
-                if(word in self.wordSet): #if the proposed correction is at all an English word
+                #if(word in self.wordSet): #if the proposed correction is at all an English word
+                 if(self.fdist.get(word, -1) != -1):
                     index = findFuncs[i](word, iw)
                     bigram = index[0] + index[1]
                     ri = ord(index[0]) - 97
