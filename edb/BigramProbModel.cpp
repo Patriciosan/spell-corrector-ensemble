@@ -43,6 +43,13 @@ using namespace std;
     //for a bigram b1b2, returns the prob of b2 given b1
     double BigramProbModel::biProb(string bigram)
     {
+        if(isupper(bigram[0])) {
+            bigram[0] = bigram[0] + 32;
+        }
+         
+        if(isupper(bigram[1])) {
+            bigram[1] = bigram[1] + 32;
+        }
         return pc[bigram[0] - 97][bigram[1] - 97].get_d();
     }
 

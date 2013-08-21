@@ -264,7 +264,7 @@ string correction(string ip, Ranker *r, string type, edb *nc)
            delete ins, trans, subs, dels, scoreString;
 	}
 
-float percent(Ranker*, edb*);
+float errorPercCalculator(Ranker*, string, edb*);
 
 int main(int argc, char *argv[]) {
 
@@ -277,16 +277,21 @@ int main(int argc, char *argv[]) {
         cout << "NPE\n!";
         return 0;
     }
-    cout <<"\n\n% of words correctly corrected : "<<  percent(r, nc) << "%\n";
-    
-    return 0;
-
-if(argc != 2) {
-        cout << "Usage : ./edb [freq|bigram|help]\n";
+    if(argc != 2) {
+        cout << "Usage : ./edb [freq|bigram|help|test]\n";
         return 0;
     }
+    if(!strcmp(argv[1], "test")) {
+    cout << "\nTesting with frequency based scoring\n\n";
+    cout <<"\n\n% of words correctly corrected with frequency based scoring: "<<  errorPercCalculator(r, "freq", nc) << "%\n";
+    
+    cout << "\nTesting with bigram probability based scoring\n\n";
+    cout <<"\n\n% of words correctly corrected with bigram probability based scoring : "<<  errorPercCalculator(r, "bigram", nc) << "%\n\n";
+        return 0;
+    }
+
     if(!strcmp(argv[1], "help")) {
-        cout << "Start the program by typing $./edb [freq|bigram]\n\n1. freq : The possible corrections are rated by considering which word has appeared most in the dictionary.\n\n2. bigram :Candidates are broken down into bigrams, the individual probabilities are then mulitiplied to get the frequency of the word\n";
+        cout << "Start the program by typing $./edb [help|freq|bigram|test]\n\n1. freq : The possible corrections are rated by considering which word has appeared most in the dictionary.\n\n2. bigram :Candidates are broken down into bigrams, the individual probabilities are then mulitiplied to get the frequency of the word\n\n3. test : Test the models\n\n";
         return 0;
     }
 	char input[40];
@@ -300,8 +305,8 @@ if(argc != 2) {
     {
 		cout << "Enter the Word (q for Exit): ";
 		cin >> input;
-        cout << correction(input, r, "freq", nc) << endl;
-       continue; 
+   //     cout << correction(input, r, "freq", nc) << endl;
+     //  continue; 
 		if(strcmp(input,"q") && strcmp(input,"Q")) {
             /*FILL ALL THE SETS*/
 			ins = nc->correct(input, edb::INS);
@@ -377,9 +382,9 @@ if(argc != 2) {
 /*Tester for edit distance based approach
  * MASSIVE TODO : Split it to other file
  */
-float percent(Ranker *r, edb *e) // functions that calculate & return the required percentage
+float errorPercCalculator(Ranker *r, string type, edb *e) // functions that calculate & return the required percentage
 {
-	  ifstream InputFile("data/knowncorrections.txt") ;
+	  ifstream InputFile("data/kc.txt") ;
       if(!InputFile) { 
           return -1.0f;
       }
@@ -398,13 +403,13 @@ float percent(Ranker *r, edb *e) // functions that calculate & return the requir
 		  ssWordsBuf >> c_word;
           std::transform(inc_word.begin(), inc_word.end(), inc_word.begin(), ::tolower);
           std::transform(c_word.begin(), c_word.end(), c_word.begin(), ::tolower);
-		  temp = correction(inc_word, r, "freq", e);
 		  //cout << inc_word << " " << c_word << " Got : " << temp << "\n";
+		  temp = correction(inc_word, r, type, e);
           if(c_word == temp) {
 			  match++;
           }
           curr = (float(total) / 4479) * 100;
-          if(curr - prev > 10) {
+          if(curr - prev >= 10) {
              cout <<"Completed : "<< curr << "%| Score = "<< (float(match) / total) * 100<< "%\n";
              prev = curr;
 		  }

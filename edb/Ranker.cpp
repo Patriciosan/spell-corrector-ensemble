@@ -11,7 +11,8 @@ Ranker::Ranker(string bigramPath, string freqPath)
         {
             if(type == "freq") {
                 return fcm -> wordProb(str);
-            } else {
+            } else if(type == "bigram"){
                 return bpm -> wordProb(str);
             }
         }
+    
