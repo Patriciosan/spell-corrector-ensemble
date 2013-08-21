@@ -1,5 +1,5 @@
 edb : build/FrequencyCountModel.o build/Ranker.o build/WordDictionary.o build/edb.o build/BigramProbModel.o
-	g++ -o edb build/FrequencyCountModel.o build/Ranker.o build/WordDictionary.o build/edb.o build/BigramProbModel.o -lgmpxx -lgmp
+	g++ -g -o edb build/FrequencyCountModel.o build/Ranker.o build/WordDictionary.o build/edb.o build/BigramProbModel.o -lgmpxx -lgmp
 
 build/WordDictionary.o : WordDictionary.h WordDictionary.cpp
 	g++ -c WordDictionary.cpp  && mv *.o build
