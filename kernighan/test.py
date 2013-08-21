@@ -54,12 +54,14 @@ def tester1(trainFile, testFilePath):
        # print "%s -> %s  (%s)" % (icw, k.correction(icw), cw.lower())
         if(res == cw): #find the correction
             hits = hits + 1
-    print float(hits) / totalTest
+    return float(hits) / totalTest
 
 
 testFiles = ["data/test1.txt", "data/test2.txt", "data/test3.txt", "data/test4.txt", "data/test5.txt"]
 trainFiles = ["data/train1.txt", "data/train2.txt", "data/train3.txt", "data/train4.txt", "data/train5.txt"]
+total = float(0)
 for i in range(0,5):
-    tester(testFiles[i], trainFiles[i])
-
+    temp = tester(testFiles[i], trainFiles[i])
+    total = total + temp 
+print "Average : %f" % float(total) / 5
 #tester1("data/se.txt", "data/kc.txt")

@@ -1,4 +1,5 @@
 //sg
+#include <sstream>
 #include "edb.h"
 #include "BigramProbModel.h"
 #include "FrequencyCountModel.h"
@@ -12,7 +13,6 @@ edb::edb(string pathToDict, string knownCorrectionsMapFile)
 	dict = new WordDictionary(pathToDict);
 
 }
-
 set<string>* edb::correct(char *w, OPTYPE op) 
 {
 	char *res;
@@ -184,9 +184,91 @@ void printCorrections(set<string> *correction, int op) {
 
 }
 
+string correction(string ip, Ranker *r, string type, edb *nc)
+{
+    char input[40];
+   strcpy(input, ip.c_str());
+	int flag=0;
 
+	set<string> *ins =new set<string>();
+	set<string> *dels =new set<string>();
+	set<string> *trans =new set<string>();
+	set<string> *subs =new set<string>();
+	set<string> *subs2 =new set<string>();
+
+		ins = nc->correct(input, edb::INS);
+			dels = nc->correct(input, edb::DEL);
+			subs = nc->correct(input, edb::SUBS);
+			trans = nc->correct(input, edb::TRANS);
+			subs2 = nc->correct(input, edb::SUBS2);
+            int wc = 0;
+            std::map<double, string> *scoreString = new std::map<double, string>();
+            double score;
+            for(set<string>::iterator it = ins -> begin(); it != ins -> end(); it++) {
+                score = r -> rank(type, *it) + edb::ISCORE;
+                if(scoreString -> find(score) == scoreString -> end()) { //not found
+                    scoreString->insert(std::make_pair(score, *it));
+                } else {
+                    string temp = scoreString -> find(score) -> second;
+                    scoreString->insert(std::make_pair(score, *it + temp));
+                }
+            }
+
+            for(set<string>::iterator it = dels -> begin(); it != dels -> end(); it++) {
+                score = r -> rank(type, *it) + edb::DSCORE;
+                if(scoreString -> find(score) == scoreString -> end()) { //not found
+                    scoreString->insert(std::make_pair(score, *it));
+                } else {
+                    string temp = scoreString -> find(score) -> second;
+                    scoreString->insert(std::make_pair(score, *it + temp));
+                }
+            }
+
+            for(set<string>::iterator it = trans -> begin(); it != trans -> end(); it++) {
+                score = r -> rank(type, *it) + edb::TRANS;
+                if(scoreString -> find(score) == scoreString -> end()) { //not found
+                    scoreString->insert(std::make_pair(score, *it));
+                } else {
+                    string temp = scoreString -> find(score) -> second;
+                    scoreString->insert(std::make_pair(score, *it + temp));
+                }
+            }
+
+            for(set<string>::iterator it = subs -> begin(); it != subs -> end(); it++) {
+                score = r -> rank(type, *it) + edb::SSCORE;
+                if(scoreString -> find(score) == scoreString -> end()) { //not found
+                    scoreString->insert(std::make_pair(score, *it));
+                } else {
+                    string temp = scoreString -> find(score) -> second;
+                    scoreString->insert(std::make_pair(score, *it + temp));
+                }
+            }
+
+           for(set<string>::iterator it = subs2 -> begin(); it != subs2 -> end(); it++) {
+                score = r -> rank(type, *it) + edb::S2SCORE;
+                if(scoreString -> find(score) == scoreString -> end()) { //not found
+                    scoreString->insert(std::make_pair(score, *it));
+                } else {
+                    string temp = scoreString -> find(score) -> second;
+                    scoreString->insert(std::make_pair(score, *it + temp));
+                }
+            }
+           std::map<double, string>::reverse_iterator it = scoreString -> rbegin();
+           return (*it).second;	
+	}
+
+float percent(Ranker*, edb*);
 int main(int argc, char *argv[]) {
-	if(argc != 2) {
+	string wordListPath("../data/wordlist.txt");
+	string knownCorrectionsFile("../data/knowncorrections.txt");
+	edb *nc = new edb(wordListPath, knownCorrectionsFile);
+
+	int flag=0;
+    Ranker *r = new Ranker(string("../data/bicount.txt"), string("../data/out.txt")); 
+    cout << percent(r, nc);
+    return 0;
+
+if(argc != 2) {
         cout << "Usage : ./edb [freq|bigram|help]\n";
         return 0;
     }
@@ -194,15 +276,8 @@ int main(int argc, char *argv[]) {
         cout << "Start the program by typing $./edb [freq|bigram]\n\n1. freq : The possible corrections are rated by considering which word has appeared most in the dictionary.\n\n2. bigram :Candidates are broken down into bigrams, the individual probabilities are then mulitiplied to get the frequency of the word\n";
         return 0;
     }
-    string wordListPath("../data/wordlist.txt");
-	string knownCorrectionsFile("../data/knowncorrections.txt");
-	edb *nc = new edb(wordListPath, knownCorrectionsFile);
 	char input[40];
-
-	int flag=0;
-    Ranker *r = new Ranker(string("../data/bicount.txt"), string("../data/out.txt")); 
-
-	set<string> *ins =new set<string>();
+    	set<string> *ins =new set<string>();
 	set<string> *dels =new set<string>();
 	set<string> *trans =new set<string>();
 	set<string> *subs =new set<string>();
@@ -212,7 +287,8 @@ int main(int argc, char *argv[]) {
     {
 		cout << "Enter the Word (q for Exit): ";
 		cin >> input;
-        
+        cout << correction(input, r, "freq", nc) << endl;
+       continue; 
 		if(strcmp(input,"q") && strcmp(input,"Q")) {
             /*FILL ALL THE SETS*/
 			ins = nc->correct(input, edb::INS);
@@ -272,6 +348,7 @@ int main(int argc, char *argv[]) {
                     scoreString->insert(std::make_pair(score, *it + temp));
                 }
             }
+            
            for(std::map<double, string>::reverse_iterator it = scoreString -> rbegin(); it != scoreString -> rend(); it++) {
                cout << it -> first << " " << it -> second << endl;
            }
@@ -284,4 +361,32 @@ int main(int argc, char *argv[]) {
 	return 0;
 
 }
-
+/*Tester for edit distance based approach
+ * MASSIVE TODO : Split it to other file
+ */
+float percent(Ranker *r, edb *e) // functions that calculate & return the required percentage
+{
+	  ifstream InputFile("data/knowncorrections.txt") ;
+	  int total=-1,match=0;
+	  string inc_word,c_word,temp;
+	  if (InputFile.is_open ())
+	  {
+		string strLine;
+		// Get every line
+		while (getline (InputFile, strLine))
+		{   
+          total++;
+          std::stringstream ssWordsBuf(strLine);
+		  while (ssWordsBuf >> inc_word)
+		  {
+		  ssWordsBuf >> c_word;
+		  temp=correction(inc_word, r, "freq", e);
+		  if(c_word == temp)
+			  match++;
+		  }
+		}
+		float per=((float)match/(float)total)*100;
+		InputFile.close ();
+		return per;
+    }
+}
