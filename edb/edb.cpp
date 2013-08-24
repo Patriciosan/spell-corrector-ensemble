@@ -269,7 +269,7 @@ float errorPercCalculator(Ranker*, string, edb*);
 int main(int argc, char *argv[]) {
 
 	string wordListPath("../data/wordlist.txt");
-	string knownCorrectionsFile("../data/knowncorrections.txt");
+	string knownCorrectionsFile("../data/kc.txt");
 	edb *nc = new edb(wordListPath, knownCorrectionsFile);
 	int flag=0;
     Ranker *r = new Ranker(string("../data/bicount.txt"), string("../data/out.txt")); 

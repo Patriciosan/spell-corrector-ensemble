@@ -5,6 +5,7 @@
 #Egsuppose we have "affort" wrongly typed as "afforr" will cause subs[t, r] += 1
 #the value trans[x, y] is the number of times "xy" was written as "yx".
 #Eg, "would" typed as "woudl" will cause trans[l][d] += 1
+
 def printMatrix(mat, name):
     import sys
     alphabet = "  a   b   c    d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z"

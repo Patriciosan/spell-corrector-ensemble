@@ -30,7 +30,7 @@ def tester(trainFile, testFilePath):
             if(res == cw): #find the correction
                 hits = hits + 1
                 
-    print float(hits) / totalWords
+    return (float(hits) / totalWords) * 100
 
 def tester1(trainFile, testFilePath):
     from kernighan import Kernighan
@@ -54,7 +54,7 @@ def tester1(trainFile, testFilePath):
        # print "%s -> %s  (%s)" % (icw, k.correction(icw), cw.lower())
         if(res == cw): #find the correction
             hits = hits + 1
-    return float(hits) / totalTest
+    return (float(hits) / totalTest) * 100
 
 
 testFiles = ["data/test1.txt", "data/test2.txt", "data/test3.txt", "data/test4.txt", "data/test5.txt"]
@@ -63,5 +63,8 @@ total = float(0)
 for i in range(0,5):
     temp = tester(testFiles[i], trainFiles[i])
     total = total + temp 
-print "Average : %f" % float(total) / 5
-#tester1("data/se.txt", "data/kc.txt")
+    print "Iteration %d over, accuracy: %f" % (i + 1, float(temp))
+    #total = total + temp 
+print "Average : %f" % float(total / 5)
+print "Testing on the wiki data : "
+print tester1("data/se.txt", "data/kc.txt")
